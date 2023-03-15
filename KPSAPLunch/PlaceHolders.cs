@@ -3,7 +3,7 @@
 */
 
 using KeePass.Plugins;
-//using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace KPSAPLunch
 {
@@ -13,8 +13,12 @@ namespace KPSAPLunch
         public const string SAPGUIShortCutEXE = "sapshcut.exe";
         public const string SAPNWBCShortCutEXE = "NWBC.exe";
 
-        //initialize empty params var
-        public ConnectionPlaceHolders placeHolders = new ConnectionPlaceHolders(true);
+        // Menu texts
+        public const string menuItemText = "KPSAPLunch options...";
+        public const string menuItemTextTooltip = "";
+
+        // Initialize empty params var
+        public ConnectionPlaceHolders placeHolders = new ConnectionPlaceHolders(false);
 
         /// <summary>
         /// Structure holds all placeholders used in connection string
@@ -62,14 +66,12 @@ namespace KPSAPLunch
 
             public string Stringify()
             {
-                //return JsonConvert.SerializeObject(this);
-                return "";
+                return JsonSerializer.Serialize(this);
             }
 
             public ConnectionPlaceHolders ToStruc(string str)
             {
-                //return JsonConvert.DeserializeObject<ConnectionPlaceHolders>(str);
-                return new ConnectionPlaceHolders();
+                return JsonSerializer.Deserialize<ConnectionPlaceHolders>(str);
             }
         }
         /// <summary>

@@ -127,7 +127,7 @@ namespace KPSAPLunch
             return !process.HasExited;
         }
 
-        #region SAPLOGON
+        #region SAPLOGON binaries_location_detection
         private string DetectSAPGUIPath(string exec)
         {
             RegistryKey rootKey = RegistryKey.OpenRemoteBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, "");

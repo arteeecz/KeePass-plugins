@@ -1,6 +1,7 @@
 ﻿/*
 	(C) 2023 David Suchopar
 */
+using System.Windows.Forms;
 using System.Drawing;
 using KeePass.Plugins;
 
@@ -8,26 +9,36 @@ namespace KPSAPLunch
 {
     public sealed class KPSAPLunchExt : Plugin
     {
-        //plugin name constant
+        // Plugin name constant
         public const string PlugInName = "KPSAPLunch";
 
-        //remember plugin's host instance
-        private static IPluginHost oHost = null;
+        // Remember plugin's host instance
+        public static IPluginHost oHost = null;
 
-        //prepare refernces for plugin's column
+        // Atribute holds app menu context
+        private ToolStripMenuItem oMenuItem = null;
+
+        // Prepare refernces for plugin's column
         private HotColumnProvider oColumnGui = null;
         private HotColumnProvider oColumnBC = null;
 
-        //project constants and default values
+        // Project constants and default values
         private ProjectConstants oParameters = new ProjectConstants();
-        //event handler
+
+        // Option dialog class
+        private PluginOptions oOptions = null;
+        
+        // Event handler
         private PluginEventHandler oEvenHandler = new PluginEventHandler();
 
-        //name of the configuration option
+        // Name of the configuration option
         private const string OptionsConnectionParams = "KPSAPLunch_ConnectionParams";
 
-        //set plugin's icon
-        public override Image SmallIcon { get { return KPSAPLunch.Properties.Resources.sap_image; } }
+        // Set plugin's icon
+        public override Image SmallIcon { get { return Properties.Resources.sap_image; } }
+
+        // Set URL for version check
+        public override string UpdateUrl { get { return Properties.Resources.URLVersionCheck; } }
 
         /// <summary>
         /// KP constructor called when plugin is loaded
@@ -41,23 +52,36 @@ namespace KPSAPLunch
             if (host == null) { return false; }
             oHost = host;
 
-            //create instances of new column
+            // Create instances of new column
             oColumnGui = new HotColumnProvider(oParameters.placeHolders);
             oColumnBC = new HotColumnProvider(oParameters.placeHolders);
 
-            //add new columns to KP
+            // Add new columns to KP
             oHost.ColumnProviderPool.Add(oColumnGui);
             oHost.ColumnProviderPool.Add(oColumnBC);
 
-            //get last connection params values
+            // Get last connection params values
             oParameters.placeHolders = oParameters.placeHolders.ToStruc(oHost.CustomConfig.GetString(OptionsConnectionParams, oParameters.GetPluginsDefaultsAsString()));
 
-            //register own event handler when db is saved
+            // Register own event handler when db is saved
             oHost.MainWindow.FileSaved += oEvenHandler.OnFileSaved;
 
-            //Initialization was succefull
+            // Get a reference to the 'Tools' menu item container
+            ToolStripItemCollection oMenu = oHost.MainWindow.ToolsMenu.DropDownItems;
+
+            // Add the popup menu item
+            oMenuItem = new ToolStripMenuItem();
+            oMenuItem.Text = ProjectConstants.menuItemText;
+            oMenuItem.ToolTipText = ProjectConstants.menuItemTextTooltip;
+            oMenuItem.Image = Properties.Resources.sap_image;
+            oMenuItem.Click += oEvenHandler.OnSettingsDlg;
+            oMenu.Add(oMenuItem);
+
+            // Initialization was succefull
             return true;
         }
+
+      
 
         /// <summary>
 		/// The <c>Terminate</c> method is called by KeePass when
