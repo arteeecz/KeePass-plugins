@@ -33,8 +33,6 @@ namespace KPSAPLunch
                     Columns.Add(column, new PluginColumnBC(column, pluginParameters));
                     break;
             }
-
-
         }
 
         public override string GetCellData(string strColumnName, PwEntry pe)
