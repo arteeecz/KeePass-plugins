@@ -7,8 +7,6 @@ using KeePassLib;
 using KeePassLib.Utility;
 using System.Diagnostics;
 using System.IO;
-using Microsoft.Win32;
-using System;
 
 namespace KPSAPLunch
 {
@@ -17,14 +15,14 @@ namespace KPSAPLunch
         private const string sapGuiColumnName = "SAPGui";
         private const string bussinesClientColumnName = "BClient";
         private SAPQueryString oQuery = null;
-        private ProjectConstants.ConnectionPlaceHolders pluginParameters;
+        private PluginParameters pluginParameters;
 
         public override string[] ColumnNames
         {
             get { return new string[] { sapGuiColumnName, bussinesClientColumnName }; }
         }
 
-        public HotColumnProvider(ProjectConstants.ConnectionPlaceHolders param)
+        public HotColumnProvider(PluginParameters param)
         {
             pluginParameters = param;
         }
@@ -54,7 +52,7 @@ namespace KPSAPLunch
         /// <param name="strColumnName"></param>
         /// <returns></returns>
         public override bool SupportsCellAction(string strColumnName)
-        { 
+        {
             switch (strColumnName)
             {
                 case sapGuiColumnName:
@@ -73,7 +71,8 @@ namespace KPSAPLunch
         /// <param name="pe"></param>
         public override void PerformCellAction(string strColumnName, PwEntry pe)
         {
-            if (pe != null) {
+            if (pe != null)
+            {
 
                 bool error = false;
                 string sMessage = string.Empty;
@@ -89,16 +88,17 @@ namespace KPSAPLunch
                 if (!pe.Strings.Exists(pluginParameters.SapRouter)) { error = true; sMessage += pluginParameters.SapRouter + "\n"; }
 
                 if (error) { MessageService.ShowFatal("Missing placeholders:\n" + sMessage); return; }
-                
+
+                SAPBinaries oExec = new SAPBinaries();
+
                 switch (strColumnName)
                 {
                     case sapGuiColumnName:
-                        //_ = NativeLib.RunConsoleApp("sapshcut", oQuery.getQueryString(oQuery.getQueryParamtersFromEntry(pe)));
-                        _ = DoLogon(DetectSAPGUIPath(ProjectConstants.SAPGUIShortCutEXE) + ProjectConstants.SAPGUIShortCutEXE, oQuery.getQueryString(oQuery.getQueryParamtersFromEntry(pe)));
+                        DoLogon(oExec.DetectSAPGUIPath(PluginParameters.SAPGUIShortCutEXE) + PluginParameters.SAPGUIShortCutEXE, oQuery.GetQueryString(oQuery.GetQueryParamtersFromEntry(pe)));
                         break;
                     case bussinesClientColumnName:
-                        //_ = NativeLib.RunConsoleApp("nwbc.exe", "/ SHORTCUT =\"" + oQuery.getQueryString(oQuery.getQueryParamtersFromEntry(pe)) + "\"");
-                        _ = DoLogon(DetectSAPGUIPath(ProjectConstants.SAPNWBCShortCutEXE) + ProjectConstants.SAPNWBCShortCutEXE, $@"/SHORTCUT=""{oQuery.getQueryString(oQuery.getQueryParamtersFromEntry(pe))}""");
+                        //DoLogon(oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE) + PluginParameters.SAPNWBCShortCutEXE, $@"/SHORTCUT=""{oQuery.GetQueryString(oQuery.GetQueryParamtersFromEntry(pe))}""");
+                        DoLogon(oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE) + PluginParameters.SAPNWBCShortCutEXE, "/SHORTCUT=\"" + oQuery.GetQueryString(oQuery.GetQueryParamtersFromEntry(pe)) + "\"");
                         break;
                     default:
                         base.PerformCellAction(strColumnName, pe);
@@ -108,9 +108,9 @@ namespace KPSAPLunch
         }
 
         private bool DoLogon(string exeName, string queryString)
-        {   
-            if (string.IsNullOrEmpty(exeName)) { return false; }  
-            
+        {
+            if (string.IsNullOrEmpty(exeName)) { return false; }
+
             FileInfo fileInfo = new FileInfo(exeName);
             ProcessStartInfo info = new ProcessStartInfo(fileInfo.FullName)
             {
@@ -126,77 +126,5 @@ namespace KPSAPLunch
 
             return !process.HasExited;
         }
-
-        #region SAPLOGON binaries_location_detection
-        private string DetectSAPGUIPath(string exec)
-        {
-            RegistryKey rootKey = RegistryKey.OpenRemoteBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, "");
-            RegistryKey subKey = null;
-
-            bool foundPath = true;
-            object objPath;
-            string sPath = "";
-            string resPath = "";
-
-            try
-            {
-                // Check path from registry for x86
-                subKey = rootKey.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\" + exec);
-                objPath = subKey.GetValue("Path");
-                sPath = Convert.ToString(objPath);
-            }
-            catch
-            {
-                foundPath = false;
-            };
-
-            if (!foundPath)
-            {
-                try
-                {
-                    // Check path from registry for 64bit
-                    subKey = rootKey.OpenSubKey("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\" + exec);
-                    objPath = subKey.GetValue("Path");
-                    sPath = Convert.ToString(objPath);
-                }
-                catch
-                {
-                    foundPath = false;
-                }
-            }
-
-            if (foundPath)
-            {
-                for (int i = 0; ((i < sPath.Length) && (sPath[i] != ';')); i++)
-                {
-                    resPath += sPath[i].ToString();
-                }
-
-                if (resPath.Length < 3)  // "C:\"
-                {
-                    foundPath = false;
-                }
-                else
-                {
-                    if (ValidateSAPGUIPath(resPath, exec)) return resPath + "\\";
-                }
-            }
-            else
-            {
-                MessageService.ShowFatal("SAPGUI not installed!", KPSAPLunchExt.PlugInName + " settings error");
-            }
-
-            return resPath;
-
-        } //DetectSAPGUIPath
-        
-        private bool ValidateSAPGUIPath(string path, string exec)
-        {
-            //Validating if 'sapshcut.exe' located by given path
-            string fileLoc = Path.Combine(path, exec);
-            FileInfo fileInfo = new FileInfo(fileLoc);
-            return (fileInfo.Exists);
-        }
-        #endregion
     }
 }

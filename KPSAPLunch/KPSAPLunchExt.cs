@@ -1,9 +1,9 @@
 ﻿/*
 	(C) 2023 David Suchopar
 */
-using System.Windows.Forms;
-using System.Drawing;
 using KeePass.Plugins;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace KPSAPLunch
 {
@@ -22,14 +22,14 @@ namespace KPSAPLunch
         private HotColumnProvider oColumnGui = null;
         private HotColumnProvider oColumnBC = null;
 
-        // Project constants and default values
-        private ProjectConstants oParameters = new ProjectConstants();
+        // Plugin parameters and default values
+        private PluginParameters oParameters;
 
-        // Option dialog class
-        private PluginOptions oOptions = null;
-        
+        // Plugin option handler
+        private PluginOptions oOptions;
+
         // Event handler
-        private PluginEventHandler oEvenHandler = new PluginEventHandler();
+        private PluginEventHandler oEvenHandler = null;
 
         // Name of the configuration option
         private const string OptionsConnectionParams = "KPSAPLunch_ConnectionParams";
@@ -50,18 +50,20 @@ namespace KPSAPLunch
             Terminate();
 
             if (host == null) { return false; }
-            oHost = host;
+
+            // Initialize runtime
+            IntInitialize(host);
 
             // Create instances of new column
-            oColumnGui = new HotColumnProvider(oParameters.placeHolders);
-            oColumnBC = new HotColumnProvider(oParameters.placeHolders);
+            oColumnGui = new HotColumnProvider(oParameters);
+            oColumnBC = new HotColumnProvider(oParameters);
 
             // Add new columns to KP
             oHost.ColumnProviderPool.Add(oColumnGui);
             oHost.ColumnProviderPool.Add(oColumnBC);
 
             // Get last connection params values
-            oParameters.placeHolders = oParameters.placeHolders.ToStruc(oHost.CustomConfig.GetString(OptionsConnectionParams, oParameters.GetPluginsDefaultsAsString()));
+            //oParameters = oParameters.ToStruc(oHost.CustomConfig.GetString(OptionsConnectionParams, oParameters.GetPluginsDefaultsAsString()));
 
             // Register own event handler when db is saved
             oHost.MainWindow.FileSaved += oEvenHandler.OnFileSaved;
@@ -70,10 +72,12 @@ namespace KPSAPLunch
             ToolStripItemCollection oMenu = oHost.MainWindow.ToolsMenu.DropDownItems;
 
             // Add the popup menu item
-            oMenuItem = new ToolStripMenuItem();
-            oMenuItem.Text = ProjectConstants.menuItemText;
-            oMenuItem.ToolTipText = ProjectConstants.menuItemTextTooltip;
-            oMenuItem.Image = Properties.Resources.sap_image;
+            oMenuItem = new ToolStripMenuItem
+            {
+                Text = PluginParameters.menuItemText,
+                ToolTipText = PluginParameters.menuItemTextTooltip,
+                Image = Properties.Resources.sap_image
+            };
             oMenuItem.Click += oEvenHandler.OnSettingsDlg;
             oMenu.Add(oMenuItem);
 
@@ -81,13 +85,25 @@ namespace KPSAPLunch
             return true;
         }
 
-      
+        private void IntInitialize(IPluginHost host)
+        {
+            oHost = host;
+
+            // Get KeePass's option handler
+            oOptions = new PluginOptions(oHost.CustomConfig);
+
+            // Get saved plugin's parammeters
+            oParameters = oOptions.PluginParametersObj;
+
+            // Inicialize event handler
+            oEvenHandler = new PluginEventHandler(oParameters, oOptions);
+        }
 
         /// <summary>
-		/// The <c>Terminate</c> method is called by KeePass when
-		/// you should free all resources, close files/streams,
-		/// remove event handlers, etc.
-		/// </summary>
+        /// The <c>Terminate</c> method is called by KeePass when
+        /// you should free all resources, close files/streams,
+        /// remove event handlers, etc.
+        /// </summary>
         public override void Terminate()
         {
             if (oHost == null) return;
@@ -98,13 +114,20 @@ namespace KPSAPLunch
             oHost.ColumnProviderPool.Remove(oColumnBC);
             oColumnBC = null;
 
-            oHost = null;
-
-            // Save the state of plugin parameters
-            oHost.CustomConfig.SetString(OptionsConnectionParams, oParameters.placeHolders.Stringify());
-
             // Remove event handler (important!)
             oHost.MainWindow.FileSaved -= oEvenHandler.OnFileSaved;
+
+            // Remove menu items
+            ToolStripItemCollection oMenu = oHost.MainWindow.ToolsMenu.DropDownItems;
+
+            if (oMenuItem != null)
+            {
+                // Unregister event handler
+                oMenuItem.Click -= oEvenHandler.OnSettingsDlg;
+                oMenu.Remove(oMenuItem);
+            }
+
+            oHost = null;
 
             base.Terminate();
         }

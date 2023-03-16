@@ -63,6 +63,26 @@ namespace KPSAPLunch.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap cancel_16 {
+            get {
+                object obj = ResourceManager.GetObject("cancel_16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap okey_16 {
+            get {
+                object obj = ResourceManager.GetObject("okey_16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap sap_image {
             get {
                 object obj = ResourceManager.GetObject("sap_image", resourceCulture);
@@ -81,7 +101,7 @@ namespace KPSAPLunch.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://sourceforge.net/p/xxx/code/HEAD/tree/releases/keepass_plugin.ver?format=raw.
+        ///   Looks up a localized string similar to https://github.com/arteeecz/KPSAPLunch/blob/master/KPSAPLunch/Info/keepass_plugin.ver.
         /// </summary>
         internal static string URLVersionCheck {
             get {

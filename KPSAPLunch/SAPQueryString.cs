@@ -3,20 +3,13 @@
 */
 
 using KeePassLib;
-using KeePassLib.Security;
-using KeePassLib.Utility;
-using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Web;
 
 namespace KPSAPLunch
 {
     internal class SAPQueryString
     {
-        public struct queryParams
+        public struct QueryParams
         {
             public string applicationServer;
             public string instanceNumber;
@@ -24,72 +17,71 @@ namespace KPSAPLunch
             public string sapRouter;
             public string systemClient;
             public string logonLanguage;
+            public string runCommand;
             public string userName;
             public string password;
+            public bool maxGui;
         }
 
-        private ProjectConstants.ConnectionPlaceHolders pluginParameters;
+        private PluginParameters pluginParameters;
 
-        public SAPQueryString(ProjectConstants.ConnectionPlaceHolders param)
+        public SAPQueryString(PluginParameters param)
         {
             pluginParameters = param;
         }
 
-        public string getQueryString(queryParams p)
+        public string GetQueryString(QueryParams p)
         {
             /*
-            string queryString = "-gui=\"" + p.sapRouter + "/H/" + p.applicationServer + "/S/32" + p.instanceNumber + "\" ";
-            queryString += "-system=" + p.systemId + " ";
-            queryString += "-client=" + p.systemClient + " ";
-            queryString += "-user=" + p.userName + " ";
-            queryString += "-pw=" + p.password + " ";
-            queryString += "-maxgui ";
-            queryString += "lang=" + p.logonLanguage + " ";
-            */
-
             StringBuilder arg = new StringBuilder();
             arg.Append($@"-gui=""{p.sapRouter}/H/{p.applicationServer}/S/32{p.instanceNumber}"""); arg.Append(" ");
             arg.Append($@"-system={p.systemId}"); arg.Append(" ");
             arg.Append($@"-client={p.systemClient}"); arg.Append(" ");
             arg.Append($@"-user={p.userName}"); arg.Append(" ");
             arg.Append($@"-pw={p.password}"); arg.Append(" ");
-            arg.Append($@"-lang={p.logonLanguage}"); arg.Append(" ");
-            arg.Append("-maxgui");
+            if (!string.IsNullOrEmpty(p.logonLanguage)) { arg.Append($@"-lang={p.logonLanguage}"); arg.Append(" "); }
+            if (!string.IsNullOrEmpty(p.runCommand)) { arg.Append($@"-command={p.runCommand}"); arg.Append(" "); }
+            if (p.maxGui) { arg.Append("-maxgui"); }
+            */
+
+            StringBuilder arg = new StringBuilder();
+            arg.Append("-gui=\"" + p.sapRouter + "/H/" + p.applicationServer + "/S/32" + p.instanceNumber + "\""); arg.Append(" ");
+            arg.Append("-system=" + p.systemId); arg.Append(" ");
+            arg.Append("-client=" + p.systemClient); arg.Append(" ");
+            arg.Append("-user=" + p.userName); arg.Append(" ");
+            arg.Append("-pw=" + p.password); arg.Append(" ");
+            if (!string.IsNullOrEmpty(p.logonLanguage)) { arg.Append("-lang=" + p.logonLanguage); arg.Append(" "); }
+            if (!string.IsNullOrEmpty(p.runCommand)) { arg.Append("-command=" + p.runCommand); arg.Append(" "); }
+            if (p.maxGui) { arg.Append("-maxgui"); }
 
             return arg.ToString();
         }
 
-        public queryParams getQueryParamtersFromEntry(PwEntry entry)
+        public QueryParams GetQueryParamtersFromEntry(PwEntry entry)
         {
-            queryParams p = new queryParams
+            QueryParams p = new QueryParams
             {
-                //mandatory palceholders
-                /*
-                applicationServer = entry.Strings.Get(ProjectConstants.PlaceHolders.ApplSrv.Stringify()).ReadString(),
-                systemClient = entry.Strings.Get(ProjectConstants.PlaceHolders.Client.Stringify()).ReadString(),
-                systemId = entry.Strings.Get(ProjectConstants.PlaceHolders.ID.Stringify()).ReadString(),
-                instanceNumber = entry.Strings.Get(ProjectConstants.PlaceHolders.Number.Stringify()).ReadString(),
-                sapRouter = entry.Strings.Get(ProjectConstants.PlaceHolders.SapRouter.Stringify()).ReadString(),
-                userName = entry.Strings.Get(ProjectConstants.PlaceHolders.UserName.Stringify()).ReadString(),
-                password = entry.Strings.Get(ProjectConstants.PlaceHolders.Password.Stringify()).ReadString()
-                */
-
-
+                // Mandatory palceholders
                 applicationServer = entry.Strings.ReadSafe(pluginParameters.ApplSrv),
                 systemClient = entry.Strings.ReadSafe(pluginParameters.Client),
                 systemId = entry.Strings.ReadSafe(pluginParameters.SysID),
                 instanceNumber = entry.Strings.ReadSafe(pluginParameters.Number),
                 sapRouter = entry.Strings.ReadSafe(pluginParameters.SapRouter),
                 userName = entry.Strings.ReadSafe(pluginParameters.Username),
-                password = entry.Strings.ReadSafe(pluginParameters.Password)
+                password = entry.Strings.ReadSafe(pluginParameters.Password),
+                runCommand = entry.Strings.ReadSafe(pluginParameters.Transaction),
+                logonLanguage = entry.Strings.ReadSafe(pluginParameters.Language),
+                maxGui = pluginParameters.isMaxGui
             };
 
-            //optional placeholders
+            /*
+            // Optional placeholders
             if (entry.Strings.Exists(pluginParameters.Language))
             {
                 p.logonLanguage = entry.Strings.Get(pluginParameters.Language).ReadString();
             }
             else p.logonLanguage = "CS";
+            */
 
             return p;
         }

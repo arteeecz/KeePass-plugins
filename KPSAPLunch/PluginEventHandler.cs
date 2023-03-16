@@ -3,17 +3,24 @@
 */
 
 using KeePass.Forms;
-using KeePassLib.Utility;
-using System.Windows.Forms;
 using System;
 
 namespace KPSAPLunch
 {
     internal class PluginEventHandler
     {
+        private PluginParameters oParameters;
+        private PluginOptions oOptions;
+
+        public PluginEventHandler(PluginParameters oParameters, PluginOptions oOptions)
+        {
+            this.oParameters = oParameters;
+            this.oOptions = oOptions;
+        }
+
         public void OnFileSaved(object sender, FileSavedEventArgs e)
         {
-           
+
         }
 
         /// <summary>
@@ -23,10 +30,10 @@ namespace KPSAPLunch
         /// <param name="e"></param>
         public void OnSettingsDlg(object sender, EventArgs e)
         {
-            OptionDialog dlg = new OptionDialog(KPSAPLunchExt.oHost.MainWindow, new PluginOptions(KPSAPLunchExt.oHost.CustomConfig));
-            dlg.ShowDialog();
+            OptionDialog dialog = new OptionDialog(KPSAPLunchExt.oHost.MainWindow, oOptions, oParameters);
+            dialog.ShowDialog();
 
-            dlg.Dispose();
+            dialog.Dispose();
         }
     }
 }

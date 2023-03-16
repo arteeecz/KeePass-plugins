@@ -14,6 +14,9 @@
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>5</LangVersion>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -28,53 +31,33 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Resources\sap_logo.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>kPSAPLunch.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="KeePass">
+    <Reference Include="KeePass, Version=2.53.1.20815, Culture=neutral, PublicKeyToken=fed2ed7716aecf5c, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\Downloads\KeePass-2.53.1\KeePass.exe</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.4.3.1\lib\net462\System.Runtime.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SAPBinaries.cs" />
     <Compile Include="OptionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -83,7 +66,7 @@
     </Compile>
     <Compile Include="KPSAPLunchExt.cs" />
     <Compile Include="PluginOptions.cs" />
-    <Compile Include="PlaceHolders.cs" />
+    <Compile Include="PluginParameters.cs" />
     <Compile Include="PluginEventHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HotColumnProvider.cs" />
@@ -95,11 +78,7 @@
     <Compile Include="SAPQueryString.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\sap_image.png" />
+    <None Include="kPSAPLunch.pfx" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="OptionDialog.resx">
@@ -116,13 +95,24 @@
   <ItemGroup>
     <None Include="Info\keepass_plugin.ver" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cancel_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\okey_16.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>C:\Program Files\KeePass Password Safe 2\KeePass.exe --plgx-create $(SolutionDir)$(TargetName) --plgx-prereq-kp:2.29 --plgx-prereq-net:4.0 --plgx-prereq-os:Windows
+    <PostBuildEvent>echo "Compiling by KeePass..."
+C:\"Program Files"\"KeePass Password Safe 2"\KeePass.exe --plgx-create $(SolutionDir)$(TargetName) --plgx-prereq-kp:2.29 --plgx-prereq-net:4.0 --plgx-prereq-os:Windows
 
-copy /Y "$(SolutionDir)\$(TargetName).plgx" "C:\Program Files\KeePass Password Safe 2\plugins\$(TargetName).plgx"
+echo "Copying to $(OutDir) directory..."
+copy /Y "$(SolutionDir)\$(TargetName).plgx"  "$(SolutionDir)$(TargetName)\$(OutDir)$(TargetName).plgx"
 
 del "$(SolutionDir)\$(TargetName).plgx"
 </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>del "$(SolutionDir)$(TargetName)\$(OutDir)$(TargetName).plgx"</PreBuildEvent>
   </PropertyGroup>
 </Project>
