@@ -18,4 +18,5 @@ KeePass 2.x plugin integrates usage of SAPGui and NWBC
 > You can set (or leave default if not used yet) entry __string value__ name (located in entry advance properties) by plugin's options. These string values should holds login values.
 
 ### Use it
+> Plugin should detect an application binaries automaticaly (can be check on plugin's option dialog).
 > Just double click on new colum on entry row and voila.
