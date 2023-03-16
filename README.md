@@ -7,16 +7,16 @@ KeePass 2.x plugin integrates usage of SAPGui and NWBC
 
 
 ## Install
-> Simply copy plugin file into keePass's plugin directory.
+> Simply copy plugin file into KeePass plugin directory.
 
 
 ## Usage
 ### New columns
-> In layout setting you can add a new plugin's columns. These column provide lunch function one of the clients.
+> In layout setting you can add a new plugin columns to entries layout. These columns provide a lunch and login function one of the clients.
 
 ### Placeholders settings
-> You can set (or leave default if not used yet) entry __string value__ name (located in entry advance properties) by plugin's options. These string values should holds login values.
+> You can set (or leave default if not used yet) entry __string value__ name (located in entry advance properties) by plugin options. These string values should holds login values.
 
 ### Use it
-> Plugin should detect an application binaries automaticaly (can be check on plugin's option dialog).
-> Just double click on new colum on entry row and voila.
+> Plugin should detect an application binaries automaticaly (can be check on plugin option dialog).
+> Just double click on new colum in entry row and voila.
