@@ -66,7 +66,7 @@ namespace KPSAPLunch
             }
             else
             {
-                MessageService.ShowFatal("SAPGUI not installed!", KPSAPLunchExt.PlugInName + " settings error");
+                MessageService.ShowFatal(exec + " not installed!", KPSAPLunchExt.PlugInName + " settings error");
             }
 
             return resPath;

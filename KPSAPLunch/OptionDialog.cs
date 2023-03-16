@@ -40,9 +40,11 @@ namespace KPSAPLunch
             isMaxGui.Checked = parameters.isMaxGui;
 
             // Read binaries path
-            SAPBinaries oExec = new SAPBinaries();
-            iSapGuiPath.Text = oExec.DetectSAPGUIPath(PluginParameters.SAPGUIShortCutEXE);
-            iNBCSPath.Text = oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE);
+            //SAPBinaries oExec = new SAPBinaries();
+            //iSapGuiPath.Text = oExec.DetectSAPGUIPath(PluginParameters.SAPGUIShortCutEXE);
+            //iNBCSPath.Text = oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE);
+            iSapGuiPath.Text = parameters.sapGuiPath;
+            iNBCSPath.Text = parameters.nBCPath;
         }
 
         private void SaveOptions()

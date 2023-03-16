@@ -13,7 +13,7 @@ namespace KPSAPLunch
     internal class HotColumnProvider : ColumnProvider
     {
         private PluginParameters pluginParameters;
-        private Dictionary<string, IPluginColumn> Columns = new Dictionary<string, IPluginColumn> ();
+        private Dictionary<string, IPluginColumn> Columns = new Dictionary<string, IPluginColumn>();
 
         public override string[] ColumnNames
         {
@@ -37,7 +37,7 @@ namespace KPSAPLunch
 
         public override string GetCellData(string strColumnName, PwEntry pe)
         {
-            return Columns[strColumnName].GetContent();
+            return Columns[strColumnName].GetContent(pe);
         }
 
         public override bool SupportsCellAction(string strColumnName)

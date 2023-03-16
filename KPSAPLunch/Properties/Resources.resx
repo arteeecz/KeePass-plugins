@@ -131,7 +131,7 @@
     <value>..\Resources\sap_logo.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="URLVersionCheck" xml:space="preserve">
-    <value>https://raw.githubusercontent.com/arteeecz/KPSAPLunch/blob/main/KPSAPLunch/Info/keepass_plugin.ver</value>
+    <value>https://raw.githubusercontent.com/arteeecz/KeePass-plugins/main/KPSAPLunch/Info/keepass_plugin.ver</value>
     <comment>URL for Version Check</comment>
   </data>
 </root>

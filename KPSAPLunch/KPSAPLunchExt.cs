@@ -53,23 +53,10 @@ namespace KPSAPLunch
             if (host == null) { return false; }
 
             // Initialize runtime
-            IntInitialize(host);
+            InitGlobals(host);
 
-            // Create instances of new column handler
-            string[] columns = { ColGuiName, ColNBCName };
-            oColumnGui = new HotColumnProvider(columns[0], oParameters);
-            // Add new columns to KP
-            oHost.ColumnProviderPool.Add(oColumnGui);
-
-            oColumnBC = new HotColumnProvider(columns[1], oParameters);
-            // Add new columns to KP
-            oHost.ColumnProviderPool.Add(oColumnBC);
-
-            // Get last connection params values
-            //oParameters = oParameters.ToStruc(oHost.CustomConfig.GetString(OptionsConnectionParams, oParameters.GetPluginsDefaultsAsString()));
-
-            // Register own event handler when db is saved
-            oHost.MainWindow.FileSaved += oEvenHandler.OnFileSaved;
+            //Create columns
+            InitColumns();
 
             // Get a reference to the 'Tools' menu item container
             ToolStripItemCollection oMenu = oHost.MainWindow.ToolsMenu.DropDownItems;
@@ -88,18 +75,37 @@ namespace KPSAPLunch
             return true;
         }
 
-        private void IntInitialize(IPluginHost host)
+        private void InitGlobals(IPluginHost host)
         {
             oHost = host;
 
-            // Get KeePass's option handler
+            // Get KeePass option handler
             oOptions = new PluginOptions(oHost.CustomConfig);
 
-            // Get saved plugin's parammeters
+            // Get saved plugin parammeters
             oParameters = oOptions.PluginParametersObj;
+
+            // Get binaries path
+            var oExec = new SAPBinaries();
+            oParameters.sapGuiPath = oExec.DetectSAPGUIPath(PluginParameters.SAPGUIShortCutEXE);
+            oParameters.nBCPath = oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE);
 
             // Inicialize event handler
             oEvenHandler = new PluginEventHandler(oParameters, oOptions);
+        }
+
+        private void InitColumns()
+        {
+            // Set name of new columns
+            string[] columns = { ColGuiName, ColNBCName };
+
+            // Create instances of new column handler and add it keepass
+            // Gui
+            oColumnGui = new HotColumnProvider(columns[0], oParameters);
+            oHost.ColumnProviderPool.Add(oColumnGui);
+            // BC
+            oColumnBC = new HotColumnProvider(columns[1], oParameters);
+            oHost.ColumnProviderPool.Add(oColumnBC);
         }
 
         /// <summary>
@@ -115,9 +121,6 @@ namespace KPSAPLunch
             oColumnGui = null;
             oHost.ColumnProviderPool.Remove(oColumnBC);
             oColumnBC = null;
-
-            // Remove event handler (important!)
-            oHost.MainWindow.FileSaved -= oEvenHandler.OnFileSaved;
 
             // Remove menu items
             ToolStripItemCollection oMenu = oHost.MainWindow.ToolsMenu.DropDownItems;

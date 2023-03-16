@@ -18,6 +18,8 @@ namespace KPSAPLunch
         public bool isMaxGui;
         public readonly string Username;
         public readonly string Password;
+        public string sapGuiPath;
+        public string nBCPath;
 
         public const string SAPGUIShortCutEXE = "sapshcut.exe";
         public const string SAPNWBCShortCutEXE = "NWBC.exe";

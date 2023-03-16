@@ -114,7 +114,7 @@
             // 
             // iSapGuiPath
             // 
-            this.iSapGuiPath.Cursor = System.Windows.Forms.Cursors.WaitCursor;
+            this.iSapGuiPath.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.iSapGuiPath.Location = new System.Drawing.Point(136, 17);
             this.iSapGuiPath.Name = "iSapGuiPath";
             this.iSapGuiPath.ReadOnly = true;

@@ -3,8 +3,6 @@
 */
 
 using KeePassLib;
-using System;
-using System.Runtime.Remoting.Messaging;
 
 namespace KPSAPLunch
 {
@@ -27,14 +25,36 @@ namespace KPSAPLunch
         public string GetName() { return Name; }
         public string GetTitle() { return Title; }
 
-        public string GetContent() { return GetContentInt(); }
+        public string GetContent(PwEntry entry) { return GetContentInt(entry); }
 
         public bool HasAction() { return true; }
 
-        public void PerformAction(PwEntry entry){ PerformActionInt(entry); }
+        public void PerformAction(PwEntry entry) { PerformActionInt(entry); }
 
-        protected virtual string GetContentInt() { return "run"; }
+        protected virtual string GetContentInt(PwEntry entry) { return string.Empty; }
         protected virtual void PerformActionInt(PwEntry entry) { }
+
+        protected bool IsEntryExecutable(PwEntry entry)
+        {
+            int count = 0;
+            if (entry.Strings.Exists(pluginParameters.ApplSrv)) { count++; }
+            if (entry.Strings.Exists(pluginParameters.Client)) { count++; }
+            if (entry.Strings.Exists(pluginParameters.SysID)) { count++; }
+            if (entry.Strings.Exists(pluginParameters.Number)) { count++; }
+            if (entry.Strings.Exists(pluginParameters.SapRouter)) { count++; }
+
+            // If exist at least two placeholders used by plugin entry has executable potencial
+            if (count > 1)
+            {
+                // Check binary
+                if (
+                    ((Name == KPSAPLunchExt.ColNBCName) && !string.IsNullOrEmpty(pluginParameters.nBCPath)) ||
+                    ((Name == KPSAPLunchExt.ColGuiName) && !string.IsNullOrEmpty(pluginParameters.sapGuiPath))
+                    ) { return true; }
+                else { return false; }
+            }
+            else { return false; }
+        }
     }
 
     /// <summary>
@@ -42,16 +62,26 @@ namespace KPSAPLunch
     /// </summary>
     public class PluginColumnGui : PluginColumn
     {
-        public PluginColumnGui(string name, PluginParameters pluginParameters) : base(name,pluginParameters)  { Title = "GUI"; }
+        public PluginColumnGui(string name, PluginParameters pluginParameters) : base(name, pluginParameters) { Title = "GUI"; }
 
-        protected override string GetContentInt() { return "▶"; }
+        protected override string GetContentInt(PwEntry entry)
+        {
+            if (IsEntryExecutable(entry))
+            {
+                return "▶";
+            }
+            else
+            {
+                return string.Empty;
+            }
+
+        }
 
         protected override void PerformActionInt(PwEntry entry)
         {
-            var oExec = new SAPBinaries();
             var oQuery = new SAPQueryString(pluginParameters);
 
-            if (oExec.DoLogon(oExec.DetectSAPGUIPath(PluginParameters.SAPGUIShortCutEXE) + PluginParameters.SAPGUIShortCutEXE, oQuery.GetQueryString(oQuery.GetQueryParamtersFromEntry(entry))))
+            if (new SAPBinaries().DoLogon(pluginParameters.sapGuiPath + PluginParameters.SAPGUIShortCutEXE, oQuery.GetQueryString(oQuery.GetQueryParamtersFromEntry(entry))))
             { };
         }
     }
@@ -60,17 +90,26 @@ namespace KPSAPLunch
     /// SAP Business Client column
     /// </summary>
     public class PluginColumnBC : PluginColumn
-    { 
+    {
         public PluginColumnBC(string name, PluginParameters pluginParameters) : base(name, pluginParameters) { Title = "BC"; }
 
-        protected override string GetContentInt() { return "▶"; }
+        protected override string GetContentInt(PwEntry entry)
+        {
+            if (IsEntryExecutable(entry))
+            {
+                return "▶";
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
 
         protected override void PerformActionInt(PwEntry entry)
         {
-            var oExec = new SAPBinaries();
             var oQuery = new SAPQueryString(pluginParameters);
 
-            if (oExec.DoLogon(oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE) + PluginParameters.SAPNWBCShortCutEXE, "/SHORTCUT=\"" + oQuery.GetQueryString(oQuery.GetQueryParamtersFromEntry(entry)) + "\""))
+            if (new SAPBinaries().DoLogon(pluginParameters.nBCPath + PluginParameters.SAPNWBCShortCutEXE, "/SHORTCUT=\"" + oQuery.GetQueryString(oQuery.GetQueryParamtersFromEntry(entry)) + "\""))
             { };
         }
     }

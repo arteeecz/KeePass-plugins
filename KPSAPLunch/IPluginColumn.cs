@@ -7,8 +7,8 @@ using KeePassLib;
 namespace KPSAPLunch
 {
     public interface IPluginColumn
-    {   
-        string GetContent();
+    {
+        string GetContent(PwEntry entry);
         string GetName();
         string GetTitle();
         bool HasAction();
