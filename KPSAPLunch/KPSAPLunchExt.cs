@@ -12,6 +12,10 @@ namespace KPSAPLunch
         // Plugin name constant
         public const string PlugInName = "KPSAPLunch";
 
+        // Name of the columns
+        public const string ColGuiName = "Gui";
+        public const string ColNBCName = "NBC";
+
         // Remember plugin's host instance
         public static IPluginHost oHost = null;
 
@@ -30,9 +34,6 @@ namespace KPSAPLunch
 
         // Event handler
         private PluginEventHandler oEvenHandler = null;
-
-        // Name of the configuration option
-        private const string OptionsConnectionParams = "KPSAPLunch_ConnectionParams";
 
         // Set plugin's icon
         public override Image SmallIcon { get { return Properties.Resources.sap_image; } }
@@ -54,12 +55,14 @@ namespace KPSAPLunch
             // Initialize runtime
             IntInitialize(host);
 
-            // Create instances of new column
-            oColumnGui = new HotColumnProvider(oParameters);
-            oColumnBC = new HotColumnProvider(oParameters);
-
+            // Create instances of new column handler
+            string[] columns = { ColGuiName, ColNBCName };
+            oColumnGui = new HotColumnProvider(columns[0], oParameters);
             // Add new columns to KP
             oHost.ColumnProviderPool.Add(oColumnGui);
+
+            oColumnBC = new HotColumnProvider(columns[1], oParameters);
+            // Add new columns to KP
             oHost.ColumnProviderPool.Add(oColumnBC);
 
             // Get last connection params values
@@ -110,7 +113,6 @@ namespace KPSAPLunch
 
             oHost.ColumnProviderPool.Remove(oColumnGui);
             oColumnGui = null;
-
             oHost.ColumnProviderPool.Remove(oColumnBC);
             oColumnBC = null;
 

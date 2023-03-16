@@ -5,6 +5,7 @@
 using KeePassLib.Utility;
 using Microsoft.Win32;
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace KPSAPLunch
@@ -78,6 +79,26 @@ namespace KPSAPLunch
             string fileLoc = Path.Combine(path, exec);
             FileInfo fileInfo = new FileInfo(fileLoc);
             return (fileInfo.Exists);
+        }
+
+        public bool DoLogon(string exeName, string queryString)
+        {
+            if (string.IsNullOrEmpty(exeName)) { return false; }
+
+            FileInfo fileInfo = new FileInfo(exeName);
+            ProcessStartInfo info = new ProcessStartInfo(fileInfo.FullName)
+            {
+                Arguments = queryString,
+                CreateNoWindow = false,
+                UseShellExecute = true,
+                ErrorDialog = true,
+                RedirectStandardInput = false,
+                RedirectStandardOutput = false
+            };
+
+            Process process = Process.Start(info);
+
+            return !process.HasExited;
         }
     }
 }

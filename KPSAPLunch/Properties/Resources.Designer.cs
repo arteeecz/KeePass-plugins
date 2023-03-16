@@ -101,7 +101,7 @@ namespace KPSAPLunch.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://github.com/arteeecz/KPSAPLunch/blob/master/KPSAPLunch/Info/keepass_plugin.ver.
+        ///   Looks up a localized string similar to https://raw.githubusercontent.com/arteeecz/KPSAPLunch/blob/main/KPSAPLunch/Info/keepass_plugin.ver.
         /// </summary>
         internal static string URLVersionCheck {
             get {

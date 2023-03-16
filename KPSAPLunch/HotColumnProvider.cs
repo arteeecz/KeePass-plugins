@@ -5,82 +5,56 @@
 using KeePass.UI;
 using KeePassLib;
 using KeePassLib.Utility;
-using System.Diagnostics;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace KPSAPLunch
 {
     internal class HotColumnProvider : ColumnProvider
     {
-        private const string sapGuiColumnName = "SAPGui";
-        private const string bussinesClientColumnName = "BClient";
-        private SAPQueryString oQuery = null;
         private PluginParameters pluginParameters;
+        private Dictionary<string, IPluginColumn> Columns = new Dictionary<string, IPluginColumn> ();
 
         public override string[] ColumnNames
         {
-            get { return new string[] { sapGuiColumnName, bussinesClientColumnName }; }
+            get { return Columns.Keys.ToArray(); }
         }
 
-        public HotColumnProvider(PluginParameters param)
+        public HotColumnProvider(string column, PluginParameters param)
         {
             pluginParameters = param;
+
+            switch (column)
+            {
+                case KPSAPLunchExt.ColGuiName:
+                    Columns.Add(column, new PluginColumnGui(column, pluginParameters));
+                    break;
+                case KPSAPLunchExt.ColNBCName:
+                    Columns.Add(column, new PluginColumnBC(column, pluginParameters));
+                    break;
+            }
+
+
         }
 
-        /// <summary>
-        /// Get column content - in this version will be only text
-        /// </summary>
-        /// <param name="strColumnName"></param>
-        /// <param name="pe"></param>
-        /// <returns></returns>
         public override string GetCellData(string strColumnName, PwEntry pe)
         {
-            switch (strColumnName)
-            {
-                case sapGuiColumnName:
-                    return sapGuiColumnName;
-                case bussinesClientColumnName:
-                    return bussinesClientColumnName;
-                default:
-                    return string.Empty;
-            }
+            return Columns[strColumnName].GetContent();
         }
 
-        /// <summary>
-        /// Enable hotspot on cell
-        /// </summary>
-        /// <param name="strColumnName"></param>
-        /// <returns></returns>
         public override bool SupportsCellAction(string strColumnName)
         {
-            switch (strColumnName)
-            {
-                case sapGuiColumnName:
-                    return true;
-                case bussinesClientColumnName:
-                    return true;
-                default:
-                    return base.SupportsCellAction(strColumnName);
-            }
+            return Columns[strColumnName].HasAction();
         }
 
-        /// <summary>
-        /// Concat CLI string and run
-        /// </summary>
-        /// <param name="strColumnName"></param>
-        /// <param name="pe"></param>
         public override void PerformCellAction(string strColumnName, PwEntry pe)
         {
             if (pe != null)
             {
-
                 bool error = false;
                 string sMessage = string.Empty;
 
-                oQuery = new SAPQueryString(pluginParameters);
-
-
-                //check if all placeholder are pressent
+                // Check if all mandatory placeholder are pressent
                 if (!pe.Strings.Exists(pluginParameters.ApplSrv)) { error = true; sMessage += pluginParameters.ApplSrv + "\n"; }
                 if (!pe.Strings.Exists(pluginParameters.Client)) { error = true; sMessage += pluginParameters.Client + "\n"; }
                 if (!pe.Strings.Exists(pluginParameters.SysID)) { error = true; sMessage += pluginParameters.SysID + "\n"; }
@@ -89,42 +63,8 @@ namespace KPSAPLunch
 
                 if (error) { MessageService.ShowFatal("Missing placeholders:\n" + sMessage); return; }
 
-                SAPBinaries oExec = new SAPBinaries();
-
-                switch (strColumnName)
-                {
-                    case sapGuiColumnName:
-                        DoLogon(oExec.DetectSAPGUIPath(PluginParameters.SAPGUIShortCutEXE) + PluginParameters.SAPGUIShortCutEXE, oQuery.GetQueryString(oQuery.GetQueryParamtersFromEntry(pe)));
-                        break;
-                    case bussinesClientColumnName:
-                        //DoLogon(oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE) + PluginParameters.SAPNWBCShortCutEXE, $@"/SHORTCUT=""{oQuery.GetQueryString(oQuery.GetQueryParamtersFromEntry(pe))}""");
-                        DoLogon(oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE) + PluginParameters.SAPNWBCShortCutEXE, "/SHORTCUT=\"" + oQuery.GetQueryString(oQuery.GetQueryParamtersFromEntry(pe)) + "\"");
-                        break;
-                    default:
-                        base.PerformCellAction(strColumnName, pe);
-                        break;
-                }
+                Columns[strColumnName].PerformAction(pe);
             }
-        }
-
-        private bool DoLogon(string exeName, string queryString)
-        {
-            if (string.IsNullOrEmpty(exeName)) { return false; }
-
-            FileInfo fileInfo = new FileInfo(exeName);
-            ProcessStartInfo info = new ProcessStartInfo(fileInfo.FullName)
-            {
-                Arguments = queryString,
-                CreateNoWindow = false,
-                UseShellExecute = true,
-                ErrorDialog = true,
-                RedirectStandardInput = false,
-                RedirectStandardOutput = false
-            };
-
-            Process process = Process.Start(info);
-
-            return !process.HasExited;
         }
     }
 }
