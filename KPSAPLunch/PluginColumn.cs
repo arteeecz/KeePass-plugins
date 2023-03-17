@@ -64,6 +64,7 @@ namespace KPSAPLunch
     {
         public PluginColumnGui(string name, PluginParameters pluginParameters) : base(name, pluginParameters) { Title = "GUI"; }
 
+        public override void PerformAction(PwEntry e) { }
         protected override string GetContentInt(PwEntry entry)
         {
             if (IsEntryExecutable(entry))
