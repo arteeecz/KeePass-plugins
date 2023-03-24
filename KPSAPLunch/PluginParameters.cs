@@ -20,6 +20,8 @@ namespace KPSAPLunch
         public readonly string Password;
         public string sapGuiPath;
         public string nBCPath;
+        public string SAPGuiPath;
+        public string SAPNWBCPath;
 
         public const string SAPGUIShortCutEXE = "sapshcut.exe";
         public const string SAPNWBCShortCutEXE = "NWBC.exe";
@@ -31,7 +33,7 @@ namespace KPSAPLunch
         /// <summary>
         /// Structure constructor
         /// </summary>
-        /// <param name="empty"></param>Determine if new varibale will contain default values
+        /// <param name="empty">Determine if new varibale will contain default values</param>
         public PluginParameters(bool empty = false)
         {
 
@@ -65,19 +67,6 @@ namespace KPSAPLunch
 
         public override string ToString()
         {
-            /*
-            return $"ApplSrv:{ApplSrv};" +
-            $"Client:{Client};" +
-            $"SysID:{SysID};" +
-            $"Number:{Number};" +
-            $"SapRouter:{SapRouter};" +
-            $"Language:{Language};" +
-            $"Transaction:{Transaction};" +
-            $"Username:{Username};" +
-            $"Password:{Password};" +
-            $"isMaxGui:{isMaxGui}";
-            */
-
             return "ApplSrv:" + ApplSrv + ";" +
             "Client:" + Client + ";" +
             "SysID:" + SysID + ";" +
@@ -87,8 +76,9 @@ namespace KPSAPLunch
             "Transaction:" + Transaction + ";" +
             "Username:" + Username + ";" +
             "Password:" + Password + ";" +
-            "isMaxGui:" + isMaxGui;
-
+            "isMaxGui:" + isMaxGui + ";" +
+            "SAPGUIPath:" + SAPGuiPath + ";" +
+            "SAPNWBCPath:" + SAPNWBCPath;
         }
 
         /// <summary>

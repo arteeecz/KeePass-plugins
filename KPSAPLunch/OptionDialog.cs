@@ -45,6 +45,18 @@ namespace KPSAPLunch
             //iNBCSPath.Text = oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE);
             iSapGuiPath.Text = parameters.sapGuiPath;
             iNBCSPath.Text = parameters.nBCPath;
+
+            if (!string.IsNullOrEmpty(iSapGuiPath.Text))
+            {
+                iSapGuiPath.ReadOnly = true;
+            }
+            else { iSapGuiPath.ReadOnly = false; }
+
+            if (!string.IsNullOrEmpty(iNBCSPath.Text))
+            {
+                iNBCSPath.ReadOnly = true;
+            }
+            else { iNBCSPath.ReadOnly = false; }
         }
 
         private void SaveOptions()
@@ -60,6 +72,8 @@ namespace KPSAPLunch
                 parameters.Language = iLanguage.Text;
                 parameters.Transaction = iTransaction.Text;
                 parameters.isMaxGui = isMaxGui.Checked;
+                parameters.sapGuiPath = iSapGuiPath.Text;
+                parameters.nBCPath = iNBCSPath.Text;
 
                 // Prepare pluginOption string to store
                 string strPar = parameters.ToString();

@@ -9,6 +9,7 @@ namespace KPSAPLunch
 {
     public sealed class KPSAPLunchExt : Plugin
     {
+        #region Public section
         // Plugin name constant
         public const string PlugInName = "KPSAPLunch";
 
@@ -18,22 +19,6 @@ namespace KPSAPLunch
 
         // Remember plugin's host instance
         public static IPluginHost oHost = null;
-
-        // Atribute holds app menu context
-        private ToolStripMenuItem oMenuItem = null;
-
-        // Prepare refernces for plugin's column
-        private HotColumnProvider oColumnGui = null;
-        private HotColumnProvider oColumnBC = null;
-
-        // Plugin parameters and default values
-        private PluginParameters oParameters;
-
-        // Plugin option handler
-        private PluginOptions oOptions;
-
-        // Event handler
-        private PluginEventHandler oEvenHandler = null;
 
         // Set plugin's icon
         public override Image SmallIcon { get { return Properties.Resources.sap_image; } }
@@ -75,39 +60,6 @@ namespace KPSAPLunch
             return true;
         }
 
-        private void InitGlobals(IPluginHost host)
-        {
-            oHost = host;
-
-            // Get KeePass option handler
-            oOptions = new PluginOptions(oHost.CustomConfig);
-
-            // Get saved plugin parammeters
-            oParameters = oOptions.PluginParametersObj;
-
-            // Get binaries path
-            var oExec = new SAPBinaries();
-            oParameters.sapGuiPath = oExec.DetectSAPGUIPath(PluginParameters.SAPGUIShortCutEXE);
-            oParameters.nBCPath = oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE);
-
-            // Inicialize event handler
-            oEvenHandler = new PluginEventHandler(oParameters, oOptions);
-        }
-
-        private void InitColumns()
-        {
-            // Set name of new columns
-            string[] columns = { ColGuiName, ColNBCName };
-
-            // Create instances of new column handler and add it keepass
-            // Gui
-            oColumnGui = new HotColumnProvider(columns[0], oParameters);
-            oHost.ColumnProviderPool.Add(oColumnGui);
-            // BC
-            oColumnBC = new HotColumnProvider(columns[1], oParameters);
-            oHost.ColumnProviderPool.Add(oColumnBC);
-        }
-
         /// <summary>
         /// The <c>Terminate</c> method is called by KeePass when
         /// you should free all resources, close files/streams,
@@ -136,5 +88,69 @@ namespace KPSAPLunch
 
             base.Terminate();
         }
+        #endregion
+
+        #region Protected section
+
+        #endregion
+
+        #region Private section
+        // Atribute holds app menu context
+        private ToolStripMenuItem oMenuItem = null;
+
+        // Prepare refernces for plugin's column
+        private HotColumnProvider oColumnGui = null;
+        private HotColumnProvider oColumnBC = null;
+
+        // Plugin parameters and default values
+        private PluginParameters oParameters;
+
+        // Plugin option handler
+        private PluginOptions oOptions;
+
+        // Event handler
+        private PluginEventHandler oEvenHandler = null;
+
+        private void InitGlobals(IPluginHost host)
+        {
+            oHost = host;
+
+            // Get KeePass option handler
+            oOptions = new PluginOptions(oHost.CustomConfig);
+
+            // Get saved plugin parammeters
+            oParameters = oOptions.PluginParametersObj;
+
+            // Get binaries path
+            var oExec = new SAPBinaries();
+            if (string.IsNullOrEmpty(oParameters.SAPGuiPath))
+            {
+                oParameters.sapGuiPath = oExec.DetectSAPGUIPath(PluginParameters.SAPGUIShortCutEXE);
+            }
+
+            if (string.IsNullOrEmpty(oParameters.SAPNWBCPath))
+            {
+                oParameters.nBCPath = oExec.DetectSAPGUIPath(PluginParameters.SAPNWBCShortCutEXE);
+            }
+
+
+            // Inicialize event handler
+            oEvenHandler = new PluginEventHandler(oParameters, oOptions);
+        }
+
+        private void InitColumns()
+        {
+            // Set name of new columns
+            string[] columns = { ColGuiName, ColNBCName };
+
+            // Create instances of new column handler and add it keepass
+            // Gui
+            oColumnGui = new HotColumnProvider(columns[0], oParameters);
+            oHost.ColumnProviderPool.Add(oColumnGui);
+            // BC
+            oColumnBC = new HotColumnProvider(columns[1], oParameters);
+            oHost.ColumnProviderPool.Add(oColumnBC);
+        }
+        #endregion       
     }
 }

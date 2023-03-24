@@ -50,7 +50,7 @@ namespace KPSAPLunch
             arg.Append("-client=" + p.systemClient); arg.Append(" ");
             arg.Append("-user=" + p.userName); arg.Append(" ");
             arg.Append("-pw=" + p.password); arg.Append(" ");
-            if (!string.IsNullOrEmpty(p.logonLanguage)) { arg.Append("-lang=" + p.logonLanguage); arg.Append(" "); }
+            if (!string.IsNullOrEmpty(p.logonLanguage)) { arg.Append("-l=" + p.logonLanguage); arg.Append(" "); }
             if (!string.IsNullOrEmpty(p.runCommand)) { arg.Append("-command=" + p.runCommand); arg.Append(" "); }
             if (p.maxGui) { arg.Append("-maxgui"); }
 
