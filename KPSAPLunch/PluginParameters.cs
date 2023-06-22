@@ -95,7 +95,7 @@ namespace KPSAPLunch
         {
             PluginParameters connectionPlaceHolders = new PluginParameters(true);
 
-            if (str == null) { return connectionPlaceHolders; }
+            if (string.IsNullOrEmpty(str)) { return connectionPlaceHolders; }
 
             Array arr = str.Split(';');
             foreach (string item in arr)
