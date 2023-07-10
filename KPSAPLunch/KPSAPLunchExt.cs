@@ -119,7 +119,14 @@ namespace KPSAPLunch
             oOptions = new PluginOptions(oHost.CustomConfig);
 
             // Get saved plugin parammeters
-            oParameters = oOptions.PluginParametersObj;
+            if (oOptions.PluginParametersObj == null)
+            {
+                oParameters = new PluginParameters();
+            }
+            else
+            {
+                oParameters = oOptions.PluginParametersObj;
+            }
 
             // Get binaries path
             var oExec = new SAPBinaries();
