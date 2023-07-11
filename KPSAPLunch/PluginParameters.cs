@@ -101,15 +101,19 @@ namespace KPSAPLunch
             foreach (string item in arr)
             {
                 Array par = item.Split(':');
-                if (par.Length > 1)
+                if (par.Length > 1 && par.GetValue(0) != null)
                 {
-                    if (typeof(PluginParameters).GetField(par.GetValue(0).ToString()).FieldType == typeof(bool))
+                    var parametr = typeof(PluginParameters).GetField(par.GetValue(0).ToString());
+                    if (parametr != null)
                     {
-                        typeof(PluginParameters).GetField(par.GetValue(0).ToString()).SetValue(connectionPlaceHolders, par.GetValue(1).ToString() == "True");
-                    }
-                    else if (typeof(PluginParameters).GetField(par.GetValue(0).ToString()).FieldType == typeof(string))
-                    {
-                        typeof(PluginParameters).GetField(par.GetValue(0).ToString()).SetValue(connectionPlaceHolders, par.GetValue(1).ToString());
+                        if (parametr.FieldType == typeof(bool))
+                        {
+                            parametr.SetValue(connectionPlaceHolders, par.GetValue(1).ToString() == "True");
+                        }
+                        else if (parametr.FieldType == typeof(string))
+                        {
+                            parametr.SetValue(connectionPlaceHolders, par.GetValue(1).ToString());
+                        }
                     }
                 }
             }
